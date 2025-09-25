@@ -1,0 +1,57 @@
+services:
+  # Backend API
+  - type: web
+    name: ugc-validation-api
+    env: docker
+    dockerfilePath: ./server/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AIRTABLE_API_KEY
+        sync: false
+      - key: AIRTABLE_BASE_ID
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_FOLDER
+        value: ugc-validation
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_DRIVE_FOLDER_ID
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 3600000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: MAX_FILE_SIZE
+        value: 10485760
+      - key: MAX_FILES
+        value: 2
+      - key: MIN_IMAGE_WIDTH
+        value: 400
+      - key: ALLOWED_MIME_TYPES
+        value: image/jpeg,image/png,image/webp
+
+  # Frontend
+  - type: web
+    name: ugc-validation-frontend
+    env: docker
+    dockerfilePath: ./client/Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
