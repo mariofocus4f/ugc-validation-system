@@ -5,13 +5,13 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
   const { results: validationResults, summary, discountCode, reviewId, orderInfo } = results;
   
   // Check if opinion can be added (2+ accepted images + text review)
-  const canAddOpinion = summary.accepted >= 2 && orderInfo?.textReview && orderInfo.textReview.trim().length >= 20;
+  const canAddOpinion = summary?.accepted >= 2 && orderInfo?.textReview && orderInfo.textReview.trim().length >= 20;
   
   // Check if opinion was already added to system
   const opinionAlreadyAdded = reviewId !== null && reviewId !== undefined;
   
   // Check if there are rejected images that can be fixed
-  const hasRejectedImages = summary.rejected > 0;
+  const hasRejectedImages = summary?.rejected > 0;
   const rejectedResults = validationResults.filter(result => result.decision === 'reject');
 
 
@@ -48,7 +48,7 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
             <div className="w-6 h-6 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-1">
               <ImageIcon className="w-3 h-3 text-primary-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{summary.total}</div>
+            <div className="text-lg font-bold text-gray-900">{summary?.total || 0}</div>
             <div className="text-xs text-gray-600">Łącznie zdjęć</div>
           </div>
 
@@ -56,7 +56,7 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
             <div className="w-6 h-6 bg-success-100 rounded-lg flex items-center justify-center mx-auto mb-1">
               <CheckCircle className="w-3 h-3 text-success-600" />
             </div>
-            <div className="text-lg font-bold text-success-600">{summary.accepted}</div>
+            <div className="text-lg font-bold text-success-600">{summary?.accepted || 0}</div>
             <div className="text-xs text-gray-600">Zaakceptowane</div>
           </div>
 
@@ -64,7 +64,7 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
             <div className="w-6 h-6 bg-error-100 rounded-lg flex items-center justify-center mx-auto mb-1">
               <XCircle className="w-3 h-3 text-error-600" />
             </div>
-            <div className="text-lg font-bold text-error-600">{summary.rejected}</div>
+            <div className="text-lg font-bold text-error-600">{summary?.rejected || 0}</div>
             <div className="text-xs text-gray-600">Odrzucone</div>
           </div>
 
@@ -132,7 +132,7 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
             className="btn-secondary flex items-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>Popraw błędne zdjęcia ({summary.rejected})</span>
+            <span>Popraw błędne zdjęcia ({summary?.rejected || 0})</span>
           </button>
         )}
         
