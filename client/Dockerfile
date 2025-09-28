@@ -25,12 +25,13 @@ COPY --from=build /app/build /app/build
 # Debug: List files to verify build
 RUN ls -la /app/build
 
-# Create simple server script
+# Create simple server script with API proxy
 RUN echo 'const http = require("http"); \
 const fs = require("fs"); \
 const path = require("path"); \
 const port = process.env.PORT || 3000; \
 const host = "0.0.0.0"; \
+const backendUrl = process.env.BACKEND_URL || "https://ugc-validation-system-production.up.railway.app"; \
 const mimeTypes = { \
   ".html": "text/html", \
   ".js": "text/javascript", \
@@ -52,6 +53,22 @@ const server = http.createServer((req, res) => { \
   if (req.url === "/health") { \
     res.writeHead(200, { "Content-Type": "application/json" }); \
     res.end(JSON.stringify({ status: "OK", timestamp: new Date().toISOString() })); \
+    return; \
+  } \
+  if (req.url.startsWith("/api/")) { \
+    const backendReq = http.request(backendUrl + req.url, { \
+      method: req.method, \
+      headers: req.headers \
+    }, (backendRes) => { \
+      res.writeHead(backendRes.statusCode, backendRes.headers); \
+      backendRes.pipe(res); \
+    }); \
+    req.pipe(backendReq); \
+    backendReq.on("error", (err) => { \
+      console.error("Backend request error:", err); \
+      res.writeHead(500, { "Content-Type": "application/json" }); \
+      res.end(JSON.stringify({ error: "Backend service unavailable" })); \
+    }); \
     return; \
   } \
   let filePath = path.join(__dirname, "build", req.url === "/" ? "index.html" : req.url); \
@@ -76,6 +93,7 @@ const server = http.createServer((req, res) => { \
 }); \
 server.listen(port, host, () => { \
   console.log(`Server running at http://${host}:${port}/`); \
+  console.log(`Backend URL: ${backendUrl}`); \
 });' > /app/server.js
 
 # Expose port 3000
