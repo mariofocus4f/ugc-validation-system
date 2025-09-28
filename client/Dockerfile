@@ -27,8 +27,10 @@ RUN ls -la /app/build
 
 # Create simple server script with API proxy
 RUN echo 'const http = require("http"); \
+const https = require("https"); \
 const fs = require("fs"); \
 const path = require("path"); \
+const url = require("url"); \
 const port = process.env.PORT || 3000; \
 const host = "0.0.0.0"; \
 const backendUrl = process.env.BACKEND_URL || "https://ugc-validation-system-production.up.railway.app"; \
@@ -56,7 +58,10 @@ const server = http.createServer((req, res) => { \
     return; \
   } \
   if (req.url.startsWith("/api/")) { \
-    const backendReq = http.request(backendUrl + req.url, { \
+    const backendUrlParsed = new url.URL(backendUrl + req.url); \
+    const isHttps = backendUrlParsed.protocol === "https:"; \
+    const requestModule = isHttps ? https : http; \
+    const backendReq = requestModule.request(backendUrlParsed, { \
       method: req.method, \
       headers: req.headers \
     }, (backendRes) => { \
