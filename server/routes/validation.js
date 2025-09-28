@@ -18,7 +18,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5242880, // 5MB
-    files: parseInt(process.env.MAX_FILES) || 1
+        files: parseInt(process.env.MAX_FILES) || 3
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = (process.env.ALLOWED_MIME_TYPES || 'image/jpeg,image/png,image/webp').split(',');
@@ -32,10 +32,12 @@ const upload = multer({
 
 // Validation schema
 const validationSchema = Joi.object({
-  images: Joi.array().min(1).max(2).required(),
+        images: Joi.array().min(3).max(3).required(),
   textReview: Joi.string().min(20).max(500).required(),
   orderEmail: Joi.string().email().required(),
   orderNumber: Joi.string().required(),
+  customerName: Joi.string().min(2).max(100).required(),
+  starRating: Joi.number().integer().min(1).max(5).required(),
   fixMode: Joi.boolean().optional(),
   rejectedImages: Joi.string().optional(),
   acceptedImages: Joi.string().optional()
@@ -45,7 +47,7 @@ const validationSchema = Joi.object({
  * POST /api/ugc/validate
  * Waliduje zdjęcia UGC używając OpenAI Vision API
  */
-router.post('/validate', upload.array('images', 2), async (req, res) => {
+router.post('/validate', upload.array('images', 3), async (req, res) => {
   try {
     // Check if files were uploaded
     if (!req.files || req.files.length === 0) {
@@ -56,7 +58,7 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
     }
 
     // Extract form data
-    const { textReview, orderEmail, orderNumber, fixMode, rejectedImages, acceptedImages } = req.body;
+    const { textReview, orderEmail, orderNumber, fixMode, rejectedImages, acceptedImages, customerName, starRating } = req.body;
     
     // Parse fix mode data if provided
     let parsedRejectedImages = [];
@@ -79,6 +81,8 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
       textReview,
       orderEmail,
       orderNumber,
+      customerName,
+      starRating: parseInt(starRating),
       fixMode: fixMode === 'true',
       rejectedImages,
       acceptedImages
@@ -260,7 +264,7 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
     // Create or update review record in reviews_done table (skip in fix mode)
     if (fixMode !== 'true') {
       try {
-        const newStatus = acceptedCount >= 2 ? 'accepted' : 'rejected';
+        const newStatus = acceptedCount >= 3 ? 'accepted' : 'rejected';
         
         if (orderInfo && orderInfo.exists) {
           // If current status is 'rejected' and new status is also 'rejected', don't save anything
@@ -274,7 +278,9 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
               newStatus,
               orderEmail,
               cloudinaryUrl,
-              textReview
+              textReview,
+              customerName,
+              starRating
             );
             reviewId = orderInfo.recordId;
             console.log(`✅ Order ${orderNumber} status updated in reviews_done to: ${newStatus}`);
@@ -287,7 +293,9 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
               newStatus,
               orderEmail,
               cloudinaryUrl,
-              textReview
+              textReview,
+              customerName,
+              starRating
             );
             console.log(`✅ New order ${orderNumber} added to reviews_done with ID: ${reviewId}`);
           } else {
@@ -304,11 +312,11 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
       reviewId = null; // Don't save in fix mode
     }
     
-    // Generate discount code if minimum 2 images are accepted (skip in fix mode)
+    // Generate discount code if minimum 3 images are accepted (skip in fix mode)
     let discountCode = null;
     let emailSent = false;
     
-    if (acceptedCount >= 2 && fixMode !== 'true') {
+    if (acceptedCount >= 3 && fixMode !== 'true') {
       // Get available discount code from Airtable
       let discountCodeData = null;
       try {
@@ -362,7 +370,7 @@ router.post('/validate', upload.array('images', 2), async (req, res) => {
 
       // Add order to reviews_done table as rejected
       try {
-        await airtableService.addOrderToDone(orderNumber, 'rejected', orderEmail, cloudinaryUrl, textReview);
+        await airtableService.addOrderToDone(orderNumber, 'rejected', orderEmail, cloudinaryUrl, textReview, customerName, starRating);
         console.log(`✅ Order ${orderNumber} added to reviews_done as rejected`);
       } catch (doneError) {
         console.error('❌ Error adding order to reviews_done:', doneError);
@@ -465,7 +473,7 @@ router.get('/status', async (req, res) => {
       folder: process.env.CLOUDINARY_FOLDER || 'ugc-validation'
     },
     features: {
-      maxFiles: parseInt(process.env.MAX_FILES) || 1,
+      maxFiles: parseInt(process.env.MAX_FILES) || 3,
       maxFileSize: parseInt(process.env.MAX_FILE_SIZE) || 5242880,
       minImageWidth: parseInt(process.env.MIN_IMAGE_WIDTH) || 200,
       allowedTypes: (process.env.ALLOWED_MIME_TYPES || 'image/jpeg,image/png,image/webp').split(',')

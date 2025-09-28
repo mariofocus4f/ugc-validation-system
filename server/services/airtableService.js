@@ -281,7 +281,7 @@ class AirtableService {
     }
   }
 
-  async addOrderToDone(orderNumber, status = 'accepted', clientEmail = '', cloudinaryLink = '', reviewText = '') {
+  async addOrderToDone(orderNumber, status = 'accepted', clientEmail = '', cloudinaryLink = '', reviewText = '', customerName = '', starRating = 0) {
     if (!this.base) {
       throw new Error('Airtable not configured');
     }
@@ -294,7 +294,9 @@ class AirtableService {
             'Status': status,
             'Client Email': clientEmail,
             'Cloudinary Link': cloudinaryLink,
-            'Review Text': reviewText
+            'Review Text': reviewText,
+            'Imie': customerName,
+            'Gwiazdki': parseInt(starRating) || 0
           }
         }
       ]);
@@ -308,7 +310,7 @@ class AirtableService {
   }
 
   // Update order status in reviews_done table
-  async updateOrderStatus(recordId, status, clientEmail = '', cloudinaryLink = '', reviewText = '') {
+  async updateOrderStatus(recordId, status, clientEmail = '', cloudinaryLink = '', reviewText = '', customerName = '', starRating = 0) {
     if (!this.base) {
       throw new Error('Airtable not configured');
     }
@@ -322,6 +324,8 @@ class AirtableService {
       if (clientEmail) updateFields['Client Email'] = clientEmail;
       if (cloudinaryLink) updateFields['Cloudinary Link'] = cloudinaryLink;
       if (reviewText) updateFields['Review Text'] = reviewText;
+      if (customerName) updateFields['Imie'] = customerName;
+      if (starRating) updateFields['Gwiazdki'] = starRating.toString();
 
       await this.base('reviews_done').update([
         {
@@ -421,7 +425,7 @@ class AirtableService {
     }
 
     try {
-      await this.base('Reviews').select({ maxRecords: 1 }).all();
+      await this.base('reviews_done').select({ maxRecords: 1 }).all();
       console.log('✅ Airtable connection test successful');
       return true;
     } catch (error) {

@@ -19,7 +19,7 @@ function errorHandler(err, req, res, next) {
   if (err.code === 'LIMIT_FILE_COUNT') {
     return res.status(400).json({
       error: 'Zbyt wiele plików',
-      message: `Maksymalna liczba plików: ${process.env.MAX_FILES || 1}`
+      message: `Maksymalna liczba plików: ${process.env.MAX_FILES || 3}`
     });
   }
 
