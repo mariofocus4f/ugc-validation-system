@@ -31,5 +31,8 @@ RUN ls -la /app/build
 # Expose port 80
 EXPOSE 80
 
+# Set environment variable for serve to listen on all interfaces
+ENV HOST=0.0.0.0
+
 # Start serve with debug
-CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 0.0.0.0:80"]
+CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 80"]
