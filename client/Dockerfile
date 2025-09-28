@@ -32,4 +32,4 @@ RUN ls -la /app/build
 EXPOSE 80
 
 # Start http-server with debug
-CMD ["sh", "-c", "echo 'Starting http-server...' && ls -la /app/build && http-server /app/build -p 80 -a 0.0.0.0 --cors"]
+CMD ["sh", "-c", "echo 'Starting http-server...' && ls -la /app/build && http-server /app/build -p 80 --cors -a 0.0.0.0"]
