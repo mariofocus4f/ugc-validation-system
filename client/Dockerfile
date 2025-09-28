@@ -29,7 +29,7 @@ RUN ls -la /app/build
 RUN echo 'const http = require("http"); \
 const fs = require("fs"); \
 const path = require("path"); \
-const port = 80; \
+const port = process.env.PORT || 3000; \
 const host = "0.0.0.0"; \
 const mimeTypes = { \
   ".html": "text/html", \
@@ -78,8 +78,8 @@ server.listen(port, host, () => { \
   console.log(`Server running at http://${host}:${port}/`); \
 });' > /app/server.js
 
-# Expose port 80
-EXPOSE 80
+# Expose port 3000
+EXPOSE 3000
 
 # Start server with debug
 CMD ["sh", "-c", "echo 'Starting Node.js server...' && ls -la /app/build && node /app/server.js"]
