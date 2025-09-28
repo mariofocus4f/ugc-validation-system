@@ -32,4 +32,4 @@ RUN ls -la /app/build
 EXPOSE 80
 
 # Start serve with debug
-CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 80"]
+CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 0.0.0.0:80"]
