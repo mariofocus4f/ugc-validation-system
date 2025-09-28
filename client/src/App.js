@@ -3,7 +3,7 @@ import ImageUploader from './components/ImageUploader';
 import ValidationResults from './components/ValidationResults';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { Copy } from 'lucide-react';
+import PhotoInstructions from './components/PhotoInstructions';
 
 function App() {
   const [validationResults, setValidationResults] = useState(null);
@@ -13,14 +13,6 @@ function App() {
   const [rejectedImages, setRejectedImages] = useState([]);
   const [acceptedImages, setAcceptedImages] = useState([]);
   
-  // Demo discount code for rewards section
-  const demoDiscountCode = 'UGC-1234-5678';
-  
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Kod skopiowany do schowka');
-    });
-  };
 
   const handleValidationComplete = (results) => {
     setValidationResults(results);
@@ -81,17 +73,21 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Dodaj zdjęcie i odbierz kupon 100zł na zakupy !
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Zweryfikuj zamówienie, wgraj 3–5 zdjęć produktu oraz opinie. Po akceptacji dostaniesz kupon 100 zł.
-            </p>
-          </div>
+          {/* Hero Section - Only show before validation */}
+          {!validationResults && (
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Dodaj zdjęcie i odbierz kupon 100zł na zakupy !
+              </h1>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Zweryfikuj zamówienie, wgraj 3–5 zdjęć produktu oraz napisz swoją opinię.
+                <br />
+                Po akceptacji zdjęć otrzymasz kupon o wartości 100 zł.
+              </p>
+            </div>
+          )}
 
           {/* Upload Section */}
           {!validationResults && (
@@ -141,7 +137,7 @@ function App() {
 
           {/* Results Section */}
           {validationResults && (
-            <div className="mb-8">
+            <div className="mb-4">
               <ValidationResults 
                 results={validationResults} 
                 onReset={handleReset}
@@ -152,58 +148,11 @@ function App() {
           )}
 
 
-          {/* Rewards Section */}
-          <div className="mt-8">
-            <div className="card">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Twoje nagrody
-              </h2>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Źródło</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Wartość</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Kod rabatowy</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-700">Kod ważny do</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-gray-900">Opinia zaakceptowana</td>
-                      <td className="py-3 px-4 text-gray-900 font-semibold">100 zł</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center space-x-2">
-                          <code className="bg-green-50 text-green-700 px-2 py-1 rounded text-sm font-mono">
-                            {demoDiscountCode}
-                          </code>
-                          <button
-                            onClick={() => copyToClipboard(demoDiscountCode)}
-                            className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
-                            title="Skopiuj kod"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Aktywny
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">2025-12-31</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
 
         </div>
       </main>
 
+      {!validationResults && <PhotoInstructions />}
       <Footer />
     </div>
   );

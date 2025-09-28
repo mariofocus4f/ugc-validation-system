@@ -12,11 +12,11 @@ function Footer() {
               Informacje
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li><a href="#" className="hover:text-gray-900">O firmie</a></li>
-              <li><a href="#" className="hover:text-gray-900">Kontakt</a></li>
-              <li><a href="#" className="hover:text-gray-900">Współpraca</a></li>
-              <li><a href="#" className="hover:text-gray-900">Systemy ratalne</a></li>
-              <li><a href="#" className="hover:text-gray-900">Usługa montażu</a></li>
+              <li><a href="https://focusgarden.pl/o-firmie" className="hover:text-gray-900">O firmie</a></li>
+              <li><a href="https://focusgarden.pl/kontakt" className="hover:text-gray-900">Kontakt</a></li>
+              <li><a href="https://focusgarden.pl/wspolpraca" className="hover:text-gray-900">Współpraca</a></li>
+              <li><a href="https://focusgarden.pl/systemy-ratalne" className="hover:text-gray-900">Systemy ratalne</a></li>
+              <li><a href="https://focusgarden.pl/usluga-montazu" className="hover:text-gray-900">Usługa montażu</a></li>
             </ul>
           </div>
 
@@ -26,13 +26,13 @@ function Footer() {
               Obsługa klienta
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li><a href="#" className="hover:text-gray-900">Regulaminy</a></li>
-              <li><a href="#" className="hover:text-gray-900">Regulaminy promocji</a></li>
-              <li><a href="#" className="hover:text-gray-900">Dostawa</a></li>
-              <li><a href="#" className="hover:text-gray-900">Polityka prywatności</a></li>
-              <li><a href="#" className="hover:text-gray-900">Reklamacje</a></li>
-              <li><a href="#" className="hover:text-gray-900">Zwroty</a></li>
-              <li><a href="#" className="hover:text-gray-900">FAQ</a></li>
+              <li><a href="https://focusgarden.pl/regulamin" className="hover:text-gray-900">Regulaminy</a></li>
+              <li><a href="https://focusgarden.pl/regulamin-akcji-promocyjnych" className="hover:text-gray-900">Regulaminy promocji</a></li>
+              <li><a href="https://focusgarden.pl/dostawa" className="hover:text-gray-900">Dostawa</a></li>
+              <li><a href="https://focusgarden.pl/polityka-prywatnosci" className="hover:text-gray-900">Polityka prywatności</a></li>
+              <li><a href="https://focusgarden.pl/reklamacje" className="hover:text-gray-900">Reklamacje</a></li>
+              <li><a href="https://focusgarden.pl/zwroty" className="hover:text-gray-900">Zwroty</a></li>
+              <li><a href="https://focusgarden.pl/faq" className="hover:text-gray-900">FAQ</a></li>
             </ul>
           </div>
 
@@ -83,7 +83,7 @@ function Footer() {
             
             {/* Social Media Icons */}
             <div className="flex space-x-3 mb-6">
-              <a href="#" className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+              <a href="https://www.facebook.com/FocusGardenPL/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
                 <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
@@ -110,33 +110,6 @@ function Footer() {
               </a>
             </div>
 
-            {/* Newsletter */}
-            <div className="space-y-3">
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Twój adres e-mail" 
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <button className="bg-primary-500 text-white px-4 py-2 rounded-r-lg text-sm font-medium hover:bg-primary-600 transition-colors flex items-center space-x-1">
-                  <span>Zapisz</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="flex items-start space-x-2">
-                <input type="checkbox" className="mt-1" />
-                <p className="text-xs text-gray-500">
-                  * Zgadzam się na otrzymywanie newslettera na podany e-mail. Zgodę mogę wycofać w każdym momencie.
-                </p>
-              </div>
-              
-              <p className="text-sm font-bold text-gray-900">
-                Zapisz się do newslettera i odbierz 100 zł na zakupy od 1500 zł.
-              </p>
-            </div>
           </div>
         </div>
         
@@ -147,9 +120,9 @@ function Footer() {
               © 2024 FocusGarden. Wszystkie prawa zastrzeżone.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Polityka prywatności</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Warunki użytkowania</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Cookies</a>
+              <a href="https://focusgarden.pl/polityka-prywatnosci" className="text-sm text-gray-500 hover:text-gray-900">Polityka prywatności</a>
+              <a href="https://focusgarden.pl/regulamin" className="text-sm text-gray-500 hover:text-gray-900">Warunki użytkowania</a>
+              <a href="https://focusgarden.pl/polityka-prywatnosci" className="text-sm text-gray-500 hover:text-gray-900">Cookies</a>
             </div>
           </div>
         </div>

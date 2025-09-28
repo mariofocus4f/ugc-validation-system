@@ -13,6 +13,10 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [orderEmail, setOrderEmail] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
+  
+  // New review fields
+  const [customerName, setCustomerName] = useState('');
+  const [starRating, setStarRating] = useState(0);
 
   // Create preview URLs for images
   const createPreview = useCallback((file) => {
@@ -34,8 +38,8 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
     }
 
     // In fix mode, limit to number of rejected images
-    // In normal mode, limit to 2 files
-    const maxFiles = fixMode ? rejectedImages.length : 2;
+    // In normal mode, limit to 6 files
+    const maxFiles = fixMode ? rejectedImages.length : 6;
     const filesToAdd = acceptedFiles.slice(0, maxFiles - selectedFiles.length);
     
     // Create previews for new files
@@ -47,7 +51,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
     
     setFilePreviews(prev => ({ ...prev, ...newPreviews }));
     setSelectedFiles(prev => [...prev, ...filesToAdd]);
-  }, [selectedFiles.length, onValidationError, createPreview]);
+  }, [selectedFiles.length, onValidationError, createPreview, fixMode, rejectedImages.length]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -57,7 +61,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       'image/webp': ['.webp']
     },
     maxSize: 5 * 1024 * 1024, // 5MB
-    maxFiles: fixMode ? rejectedImages.length : 2,
+        maxFiles: fixMode ? rejectedImages.length : 3,
     disabled: isLoading
   });
 
@@ -89,14 +93,32 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       return;
     }
     
-    const requiredFiles = fixMode ? rejectedImages.length : 2;
+    const requiredFiles = fixMode ? rejectedImages.length : 3;
+    const maxFiles = fixMode ? rejectedImages.length : 6;
+    
     if (selectedFiles.length < requiredFiles) {
       onValidationError(`Dodaj przynajmniej ${requiredFiles} ${requiredFiles === 1 ? 'zdjęcie' : 'zdjęcia'} produktu`);
       return;
     }
     
-    if (!textReview.trim() || textReview.trim().length < 20) {
+    if (selectedFiles.length > maxFiles) {
+      onValidationError(`Możesz dodać maksymalnie ${maxFiles} ${maxFiles === 1 ? 'zdjęcie' : 'zdjęć'} produktu`);
+      return;
+    }
+    
+    // Check if text review has minimum content
+    if (textReview.trim().length < 20) {
       onValidationError('Dodaj opinię tekstową o produkcie (minimum 20 znaków)');
+      return;
+    }
+    
+    if (!customerName.trim()) {
+      onValidationError('Wprowadź swoje imię');
+      return;
+    }
+    
+    if (starRating === 0) {
+      onValidationError('Wybierz ocenę w skali 1-5 gwiazdek');
       return;
     }
     
@@ -110,7 +132,6 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
     setProgress(10);
 
     try {
-      const startTime = Date.now();
       
       // Symulacja postępu - szybsza animacja z wartościami procentowymi
       const progressSteps = [
@@ -147,7 +168,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       }, 300); // Szybsze przełączanie co 300ms
       
       const fixModeData = fixMode ? { rejectedImages, acceptedImages } : null;
-      const results = await validateImages(selectedFiles, textReview, orderEmail, orderNumber, fixModeData);
+      const results = await validateImages(selectedFiles, textReview, orderEmail, orderNumber, fixModeData, customerName, starRating);
       
       clearInterval(progressInterval);
       setCurrentStep('Zakończono!');
@@ -284,7 +305,12 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
           <p className="text-gray-500 mb-4">
             {fixMode 
               ? `Maksymalnie ${rejectedImages.length} plik${rejectedImages.length === 1 ? '' : 'i'}, do 5MB każdy`
-              : 'Maksymalnie 2 pliki, do 5MB każdy'
+              : <>
+                  Dodaj dokładnie 3 zdjęcia, do 5 MB każde. (jpg, png). Pamiętaj aby na zdjęciu nie pokazywać ludzi, tylko zakupione produkty.{' '}
+                  <a href="#photo-instructions" className="text-primary-600 hover:text-primary-700 underline text-sm">
+                    Sprawdź jak zrobić dobre zdjęcia
+                  </a>
+                </>
             }
           </p>
           <div className="flex flex-wrap justify-center gap-2 text-sm text-gray-400">
@@ -299,7 +325,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       {selectedFiles.length > 0 && (
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Wybrane zdjęcia ({selectedFiles.length}/{fixMode ? rejectedImages.length : 2})
+            Wybrane zdjęcia ({selectedFiles.length}/{fixMode ? rejectedImages.length : 3})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedFiles.map((file, index) => (
@@ -342,39 +368,136 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
         </div>
       )}
 
-      {/* Text Review */}
+      {/* Image Requirements - Compact Version */}
+      {selectedFiles.length > 0 && (
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-medium text-blue-900 mb-2">
+                Wymagania dotyczące zdjęć:
+              </h4>
+              <ul className="text-xs text-blue-800 space-y-1">
+                <li>• Minimalna szerokość: 400px</li>
+                <li>• Maksymalny rozmiar: 5MB na plik</li>
+                <li>• Dozwolone formaty: JPG, PNG, WebP</li>
+                <li>• Zdjęcia nie mogą zawierać osób, dzieci</li>
+                <li>• Produkt powinien być dobrze widoczny i ostry</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Form */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Opinia o produkcie <span className="text-red-500 text-sm">*</span>
+          Twoja opinia o produkcie <span className="text-red-500 text-sm">*</span>
         </h3>
-        <textarea
-          value={textReview}
-          onChange={(e) => setTextReview(e.target.value)}
-          placeholder="Napisz swoją opinię o produkcie... (minimum 20 znaków)"
-          className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-          rows={4}
-          disabled={isLoading}
-        />
-        <div className="mt-2 text-sm text-gray-500">
-          {textReview.length}/500 znaków {textReview.length < 20 && <span className="text-red-500">- minimum 20 znaków</span>}
+        
+        <div className="space-y-6">
+          {/* Customer Name */}
+          <div>
+            <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
+              Twoje Imię <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="customerName"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="np. Anna Kowalska"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              disabled={isLoading}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              To imię będzie wyświetlane przy Twojej opinii na stronie
+            </p>
+          </div>
+
+          {/* Star Rating */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Ocena produktu <span className="text-red-500">*</span>
+            </label>
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setStarRating(star)}
+                  disabled={isLoading}
+                  className={`
+                    w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-colors duration-200
+                    ${star <= starRating 
+                      ? 'text-yellow-400 bg-yellow-50' 
+                      : 'text-gray-300 hover:text-yellow-300 hover:bg-yellow-50'
+                    }
+                    ${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                >
+                  ★
+                </button>
+              ))}
+              <span className="ml-3 text-sm text-gray-600">
+                {starRating > 0 ? `${starRating} z 5 gwiazdek` : 'Wybierz ocenę'}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Ocena w skali od 1 do 5 gwiazdek
+            </p>
+          </div>
+
+          {/* Text Review */}
+          <div>
+            <label htmlFor="textReview" className="block text-sm font-medium text-gray-700 mb-2">
+              Twoja opinia tekstowa <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="textReview"
+              value={textReview}
+              onChange={(e) => setTextReview(e.target.value)}
+              placeholder="Opisz swoje doświadczenia z produktem - jakość, funkcjonalność, czy poleciłbyś go innym..."
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              rows={4}
+              disabled={isLoading}
+            />
+            <div className="mt-2 flex justify-between items-center">
+              <div className="text-sm text-gray-500">
+                {textReview.length}/500 znaków 
+                {textReview.length < 20 && <span className="text-red-500"> - minimum 20 znaków</span>}
+              </div>
+              <div className="text-xs text-gray-400">
+                {textReview.length >= 20 ? '✓ Wystarczająco długie' : 'Za krótkie'}
+              </div>
+            </div>
+          </div>
         </div>
         
-        {/* Simplified Review Guide */}
-        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-          <h4 className="font-semibold mb-2 flex items-center">
+        {/* Review Guide */}
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+          <h4 className="font-semibold mb-3 flex items-center">
             <span className="mr-2">💡</span> Wskazówki do opinii:
           </h4>
-          <ul className="list-disc list-inside space-y-1">
-            <li>
-              <strong>Co opisać:</strong> Pierwsze wrażenia, użytkowanie, funkcjonalność, jakość materiałów, design, trwałość, stosunek ceny do jakości.
-            </li>
-            <li>
-              <strong>Czego unikać:</strong> Zbyt krótkich opinii (min. 20 znaków), spamu, wulgaryzmów, danych osobowych.
-            </li>
-            <li>
-              <strong>Przykład:</strong> "Sofa jest bardzo wygodna, łatwa w czyszczeniu, montaż był prosty, świetny stosunek jakości do ceny."
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h5 className="font-medium mb-2">Co opisać:</h5>
+              <ul className="list-disc list-inside space-y-1 text-xs">
+                <li>Pierwsze wrażenia po rozpakowaniu</li>
+                <li>Jakość materiałów i wykonania</li>
+                <li>Funkcjonalność w praktyce</li>
+                <li>Stosunek ceny do jakości</li>
+                <li>Rekomendacja dla innych</li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-medium mb-2">Przykład:</h5>
+              <p className="text-xs italic">
+                "Produkt wyglądał świetnie po rozpakowaniu. Materiał jest solidny, montaż prosty. 
+                Sprawdza się idealnie w codziennym użytkowaniu. Za tę cenę to świetny wybór - polecam!"
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -391,11 +514,11 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
           />
           <label htmlFor="acceptTerms" className="text-sm text-gray-700">
             <span className="text-red-500">*</span> Akceptuję{' '}
-            <a href="#" className="text-primary-600 hover:text-primary-700 underline">
+            <a href="https://focusgarden.pl/regulamin" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">
               regulamin
             </a>{' '}
             i{' '}
-            <a href="#" className="text-primary-600 hover:text-primary-700 underline">
+            <a href="https://focusgarden.pl/polityka-prywatnosci" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">
               politykę prywatności
             </a>
             . Zgadzam się na przetwarzanie moich danych osobowych w celu publikacji opinii i otrzymania kodu rabatowego.
@@ -403,24 +526,6 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
         </div>
       </div>
 
-      {/* Requirements */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <div className="flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-sm font-medium text-blue-900 mb-2">
-              Wymagania dotyczące zdjęć:
-            </h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Minimalna szerokość: 400px</li>
-              <li>• Maksymalny rozmiar: 5MB na plik</li>
-              <li>• Dozwolone formaty: JPG, PNG, WebP</li>
-              <li>• Zdjęcia nie mogą zawierać osób, dzieci</li>
-              <li>• Produkt powinien być dobrze widoczny i ostry</li>
-            </ul>
-          </div>
-        </div>
-      </div>
 
       {/* Progress Bar */}
       {isLoading && (
@@ -442,10 +547,10 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       <div className="mt-6 flex justify-end">
         <button
           onClick={handleSubmit}
-          disabled={!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms}
+          disabled={!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20}
           className={`
             px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2
-            ${!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms
+            ${!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-primary-600 hover:bg-primary-700 text-white'
             }
@@ -459,7 +564,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
           ) : (
             <>
               <Upload className="w-4 h-4" />
-              <span>{fixMode ? 'Popraw zdjęcia' : 'Wyślij do walidacji'}</span>
+              <span>{fixMode ? 'Popraw zdjęcia' : 'Dodaj swoją opinię'}</span>
             </>
           )}
         </button>
