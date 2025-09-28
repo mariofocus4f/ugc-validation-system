@@ -33,10 +33,16 @@ const upload = multer({
 // Validation schema
 const validationSchema = Joi.object({
         images: Joi.array().min(3).max(3).required(),
-  textReview: Joi.string().min(20).max(500).required(),
+  textReview: Joi.string().min(20).max(500).required().pattern(/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9\s.,!?\-()]+$/).messages({
+    'string.pattern.base': 'Opinia może zawierać tylko litery, cyfry, spacje i podstawowe znaki interpunkcyjne'
+  }),
   orderEmail: Joi.string().email().required(),
-  orderNumber: Joi.string().required(),
-  customerName: Joi.string().min(2).max(100).required(),
+  orderNumber: Joi.string().required().pattern(/^[a-zA-Z0-9\-_]+$/).messages({
+    'string.pattern.base': 'Numer zamówienia może zawierać tylko litery, cyfry, myślniki i podkreślenia'
+  }),
+  customerName: Joi.string().min(2).max(100).required().pattern(/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s]+$/).messages({
+    'string.pattern.base': 'Imię może zawierać tylko litery i spacje'
+  }),
   starRating: Joi.number().integer().min(1).max(5).required(),
   fixMode: Joi.boolean().optional(),
   rejectedImages: Joi.string().optional(),
