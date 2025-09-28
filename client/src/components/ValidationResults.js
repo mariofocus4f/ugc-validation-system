@@ -12,7 +12,7 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
   
   // Check if there are rejected images that can be fixed
   const hasRejectedImages = summary?.rejected > 0;
-  const rejectedResults = validationResults.filter(result => result.decision === 'reject');
+  const rejectedResults = validationResults?.filter(result => result.decision === 'reject') || [];
 
 
   const copyToClipboard = (text) => {
