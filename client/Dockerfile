@@ -49,6 +49,11 @@ const mimeTypes = { \
   ".wasm": "application/wasm" \
 }; \
 const server = http.createServer((req, res) => { \
+  if (req.url === "/health") { \
+    res.writeHead(200, { "Content-Type": "application/json" }); \
+    res.end(JSON.stringify({ status: "OK", timestamp: new Date().toISOString() })); \
+    return; \
+  } \
   let filePath = path.join(__dirname, "build", req.url === "/" ? "index.html" : req.url); \
   const extname = String(path.extname(filePath)).toLowerCase(); \
   const mimeType = mimeTypes[extname] || "application/octet-stream"; \
