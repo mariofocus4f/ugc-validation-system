@@ -16,11 +16,11 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Production stage with http-server
+# Production stage with serve
 FROM node:18-alpine
 
-# Install http-server globally
-RUN npm install -g http-server
+# Install serve globally
+RUN npm install -g serve
 
 # Copy built app from build stage
 COPY --from=build /app/build /app/build
@@ -31,5 +31,5 @@ RUN ls -la /app/build
 # Expose port 80
 EXPOSE 80
 
-# Start http-server with debug
-CMD ["sh", "-c", "echo 'Starting http-server...' && ls -la /app/build && http-server /app/build -p 80 --cors -a 0.0.0.0"]
+# Start serve with debug
+CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 0.0.0.0:80"]
