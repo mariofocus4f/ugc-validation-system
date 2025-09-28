@@ -22,6 +22,9 @@ FROM nginx:alpine
 # Copy built app from build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Set proper permissions
+RUN chmod -R 755 /usr/share/nginx/html && chown -R nginx:nginx /usr/share/nginx/html
+
 # Debug: List files to verify build
 RUN ls -la /usr/share/nginx/html
 
