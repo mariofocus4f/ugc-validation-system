@@ -25,8 +25,11 @@ RUN npm install -g serve
 # Copy built app from build stage
 COPY --from=build /app/build /app/build
 
+# Debug: List files to verify build
+RUN ls -la /app/build
+
 # Expose port 80
 EXPOSE 80
 
-# Start serve
-CMD ["serve", "-s", "/app/build", "-l", "80"]
+# Start serve with debug
+CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 80"]
