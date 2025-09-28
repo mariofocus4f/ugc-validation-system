@@ -16,20 +16,25 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Production stage with serve
-FROM node:18-alpine
-
-# Install serve globally
-RUN npm install -g serve
+# Production stage with Nginx
+FROM nginx:alpine
 
 # Copy built app from build stage
-COPY --from=build /app/build /app/build
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Debug: List files to verify build
-RUN ls -la /app/build
+# Create simple nginx config
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
 
-# Start serve with debug
-CMD ["sh", "-c", "echo 'Starting serve...' && ls -la /app/build && serve -s /app/build -l 80 --host 0.0.0.0"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
