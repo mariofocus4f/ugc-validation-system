@@ -251,7 +251,24 @@ class AirtableService {
     }
 
     try {
-      // Check only in reviews_done table
+      // First check if order exists in main orders table
+      const orderRecords = await this.base('Orders').select({
+        filterByFormula: `{Order number} = "${orderNumber}"`,
+        maxRecords: 1
+      }).all();
+
+      if (orderRecords.length === 0) {
+        console.log(`❌ Order ${orderNumber} not found in main Orders table`);
+        return {
+          exists: false,
+          status: null,
+          recordId: null
+        };
+      }
+
+      console.log(`✅ Order ${orderNumber} found in main Orders table`);
+
+      // Then check if it already has a review in reviews_done table
       const doneRecords = await this.base('reviews_done').select({
         filterByFormula: `{Order number} = "${orderNumber}"`,
         maxRecords: 1
@@ -269,10 +286,10 @@ class AirtableService {
         };
       }
 
-      console.log(`✅ Order ${orderNumber} not found in reviews_done table - can proceed`);
+      console.log(`✅ Order ${orderNumber} exists but no review yet - can proceed`);
       return {
-        exists: false,
-        status: null,
+        exists: true,
+        status: 'not_yet',
         recordId: null
       };
     } catch (error) {
