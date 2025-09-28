@@ -10,13 +10,13 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Copy package files
-COPY package*.json ./
+COPY server/package*.json ./
 
 # Install dependencies
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy application code
-COPY . .
+COPY server/ .
 
 # Create logs directory
 RUN mkdir -p logs
