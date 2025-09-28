@@ -58,7 +58,8 @@ const server = http.createServer((req, res) => { \
     return; \
   } \
   if (req.url.startsWith("/api/")) { \
-    const backendUrlParsed = new url.URL(backendUrl + req.url); \
+    const backendPath = req.url.replace("/api", ""); \
+    const backendUrlParsed = new url.URL(backendUrl + backendPath); \
     const isHttps = backendUrlParsed.protocol === "https:"; \
     const requestModule = isHttps ? https : http; \
     const backendReq = requestModule.request(backendUrlParsed, { \
