@@ -325,7 +325,7 @@ class AirtableService {
       if (cloudinaryLink) updateFields['Cloudinary Link'] = cloudinaryLink;
       if (reviewText) updateFields['Review Text'] = reviewText;
       if (customerName) updateFields['Imie'] = customerName;
-      if (starRating) updateFields['Gwiazdki'] = starRating.toString();
+      if (starRating) updateFields['Gwiazdki'] = parseInt(starRating) || 0;
 
       await this.base('reviews_done').update([
         {
