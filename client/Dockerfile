@@ -42,5 +42,5 @@ RUN cat /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start nginx with debug
+CMD ["sh", "-c", "echo 'Starting nginx...' && ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
