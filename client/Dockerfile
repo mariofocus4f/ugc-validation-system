@@ -16,21 +16,17 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Production stage with Nginx
-FROM nginx:alpine
+# Production stage with serve
+FROM node:18-alpine
+
+# Install serve globally
+RUN npm install -g serve
 
 # Copy built app from build stage
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/build /app/build
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Expose port 3000
+EXPOSE 3000
 
-# Set proper permissions and ownership
-RUN chmod -R 755 /usr/share/nginx/html && \
-    chown -R nginx:nginx /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start serve
+CMD ["serve", "-s", "/app/build", "-l", "3000"]
