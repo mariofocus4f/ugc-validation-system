@@ -97,10 +97,10 @@ app.use('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server uruchomiony na porcie ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔍 UGC Validation: http://localhost:${PORT}/api/ugc/validate`);
+  console.log(`📊 Health check: http://0.0.0.0:${PORT}/api/health`);
+  console.log(`🔍 UGC Validation: http://0.0.0.0:${PORT}/api/ugc/validate`);
 });
 
 module.exports = app;
