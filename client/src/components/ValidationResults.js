@@ -140,9 +140,14 @@ function ValidationResults({ results, onReset, onAddOpinion, onFixRejected }) {
         
         {/* Show success message if opinion was already added */}
         {opinionAlreadyAdded && (
-          <div className="flex items-center space-x-2 text-green-600">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">Opinia została dodana do systemu!</span>
+          <div className="flex flex-col space-y-2 text-green-600">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">Opinia została dodana do systemu!</span>
+            </div>
+            <p className="text-sm text-gray-700 pl-7">
+              Zapisana! Po jej pozytywnej weryfikacji otrzymasz kod rabatowy. Zazwyczaj zajmuje nam to jeden dzień roboczy.
+            </p>
           </div>
         )}
       </div>
