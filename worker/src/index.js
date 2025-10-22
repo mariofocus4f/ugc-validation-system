@@ -21,10 +21,14 @@ export default {
     const origin = request.headers.get('Origin');
     const allowedOrigins = [
       'https://ugc-validation.pages.dev',
+      'https://1d1063b5.ugc-validation.pages.dev',
       'http://localhost:3000'
     ];
     
-    const corsOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+    // Allow any subdomain of ugc-validation.pages.dev
+    const isCloudflarePages = origin && origin.match(/^https:\/\/[a-z0-9]+\.ugc-validation\.pages\.dev$/);
+    
+    const corsOrigin = allowedOrigins.includes(origin) || isCloudflarePages ? origin : allowedOrigins[0];
     
     const headers = {
       ...corsHeaders,
