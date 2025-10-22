@@ -36,7 +36,6 @@ const validationSchema = Joi.object({
   textReview: Joi.string().min(20).max(500).required().pattern(/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9\s.,!?\-()]+$/).messages({
     'string.pattern.base': 'Opinia może zawierać tylko litery, cyfry, spacje i podstawowe znaki interpunkcyjne'
   }),
-  orderEmail: Joi.string().email().required(),
   orderNumber: Joi.string().required().pattern(/^[a-zA-Z0-9\-_]+$/).messages({
     'string.pattern.base': 'Numer zamówienia może zawierać tylko litery, cyfry, myślniki i podkreślenia'
   }),
@@ -64,7 +63,7 @@ router.post('/validate', upload.array('images', 3), async (req, res) => {
     }
 
     // Extract form data
-    const { textReview, orderEmail, orderNumber, fixMode, rejectedImages, acceptedImages, customerName, starRating } = req.body;
+    const { textReview, orderNumber, fixMode, rejectedImages, acceptedImages, customerName, starRating } = req.body;
     
     // Parse fix mode data if provided
     let parsedRejectedImages = [];
@@ -85,7 +84,6 @@ router.post('/validate', upload.array('images', 3), async (req, res) => {
     const { error } = validationSchema.validate({
       images: req.files,
       textReview,
-      orderEmail,
       orderNumber,
       customerName,
       starRating: parseInt(starRating),
@@ -111,6 +109,13 @@ router.post('/validate', upload.array('images', 3), async (req, res) => {
       try {
         orderInfo = await airtableService.checkOrderExists(orderNumber);
         
+        if (!orderInfo.exists) {
+          return res.status(400).json({
+            error: 'Zamówienie nie istnieje',
+            message: `Podany numer zamówienia ${orderNumber} nie istnieje w naszej bazie danych. Sprawdź numer zamówienia i spróbuj ponownie.`
+          });
+        }
+        
         if (orderInfo.exists) {
           // If order has status 'accepted', never allow new review
           if (orderInfo.status === 'accepted') {
@@ -123,12 +128,13 @@ router.post('/validate', upload.array('images', 3), async (req, res) => {
           if (orderInfo.status === 'rejected' || orderInfo.status === 'not_yet') {
             console.log(`✅ Order ${orderNumber} has status '${orderInfo.status}' - proceeding with review`);
           }
-        } else {
-          console.log(`✅ Order ${orderNumber} not found - will create new record`);
         }
       } catch (checkError) {
         console.error('❌ Error checking order existence:', checkError);
-        // Continue processing even if check fails
+        return res.status(500).json({
+          error: 'Błąd weryfikacji zamówienia',
+          message: 'Nie można zweryfikować numeru zamówienia. Spróbuj ponownie za chwilę.'
+        });
       }
     } else {
       console.log(`🔧 Fix mode: Skipping order existence check`);
@@ -199,27 +205,14 @@ router.post('/validate', upload.array('images', 3), async (req, res) => {
           }
         }
 
-        // Convert to base64 for OpenAI
-        const base64Image = image.buffer.toString('base64');
-        const mimeType = image.mimetype;
-
-        // Validate with OpenAI
-        console.log(`Calling OpenAI API for ${image.originalname}...`);
-        let validationResult;
-        try {
-          validationResult = await validateImage(base64Image, mimeType);
-          console.log(`OpenAI result for ${image.originalname}:`, validationResult);
-        } catch (openaiError) {
-          console.error(`❌ OpenAI API error for ${image.originalname}:`, openaiError.message);
-          // Create a mock result for testing - always accept in test mode
-          validationResult = {
-            decision: 'accept', // Mock acceptance for testing
-            score: 85,
-            people: false,
-            feedback: 'Zdjęcie zostało zaakceptowane (tryb testowy)'
-          };
-          console.log(`⚠️ Using mock result for ${image.originalname}:`, validationResult);
-        }
+        // AUTO-ACCEPT: Skip AI validation - automatically accept all images
+        console.log(`✅ Auto-accepting ${image.originalname} (AI validation disabled)`);
+        let validationResult = {
+          decision: 'accept',
+          score: 100,
+          people: false,
+          feedback: 'Zdjęcie zostało zaakceptowane automatycznie'
+        };
         
         // Add filename and cloudinary URL to result
         validationResult.filename = image.originalname;

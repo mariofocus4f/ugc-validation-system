@@ -63,14 +63,13 @@ api.interceptors.response.use(
  * Validates images using the UGC validation API
  * @param {File[]} files - Array of image files to validate
  * @param {string} textReview - Text review of the product
- * @param {string} orderEmail - Order email address
  * @param {string} orderNumber - Order number
  * @param {Object} fixModeData - Data for fix mode (rejectedImages, acceptedImages)
  * @param {string} customerName - Customer name for the review
  * @param {number} starRating - Star rating from 1 to 5
  * @returns {Promise<Object>} Validation results
  */
-export const validateImages = async (files, textReview, orderEmail, orderNumber, fixModeData = null, customerName = '', starRating = 0) => {
+export const validateImages = async (files, textReview, orderNumber, fixModeData = null, customerName = '', starRating = 0) => {
   try {
     const formData = new FormData();
     
@@ -83,7 +82,6 @@ export const validateImages = async (files, textReview, orderEmail, orderNumber,
     formData.append('textReview', textReview);
     
     // Add order data
-    formData.append('orderEmail', orderEmail);
     formData.append('orderNumber', orderNumber);
     
     // Add review data

@@ -11,7 +11,6 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
   const [progress, setProgress] = useState(0);
   const [textReview, setTextReview] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [orderEmail, setOrderEmail] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   
   // New review fields
@@ -76,18 +75,6 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
   };
 
   const handleSubmit = async () => {
-    if (!orderEmail.trim()) {
-      onValidationError('Wprowadź adres email zamówienia');
-      return;
-    }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(orderEmail.trim())) {
-      onValidationError('Wprowadź prawidłowy adres email');
-      return;
-    }
-    
     if (!orderNumber.trim()) {
       onValidationError('Wprowadź numer zamówienia');
       return;
@@ -168,7 +155,7 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       }, 300); // Szybsze przełączanie co 300ms
       
       const fixModeData = fixMode ? { rejectedImages, acceptedImages } : null;
-      const results = await validateImages(selectedFiles, textReview, orderEmail, orderNumber, fixModeData, customerName, starRating);
+      const results = await validateImages(selectedFiles, textReview, orderNumber, fixModeData, customerName, starRating);
       
       clearInterval(progressInterval);
       setCurrentStep('Zakończono!');
@@ -219,42 +206,22 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="orderEmail" className="block text-sm font-medium text-primary-800 mb-2">
-              Adres email zamówienia <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              id="orderEmail"
-              value={orderEmail}
-              onChange={(e) => setOrderEmail(e.target.value)}
-              placeholder="np. klient@example.com"
-              className="w-full p-3 border border-primary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={isLoading}
-            />
-            <p className="text-xs text-primary-600 mt-1">
-              Email używany przy składaniu zamówienia - służy do weryfikacji
-            </p>
-          </div>
-          
-          <div>
-            <label htmlFor="orderNumber" className="block text-sm font-medium text-primary-800 mb-2">
-              Numer zamówienia <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="orderNumber"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              placeholder="np. #ORD-2024-7891"
-              className="w-full p-3 border border-primary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={isLoading}
-            />
-            <p className="text-xs text-primary-600 mt-1">
-              Numer zamówienia - służy do weryfikacji i pobrania nazwy produktu
-            </p>
-          </div>
+        <div>
+          <label htmlFor="orderNumber" className="block text-sm font-medium text-primary-800 mb-2">
+            Numer zamówienia <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="orderNumber"
+            value={orderNumber}
+            onChange={(e) => setOrderNumber(e.target.value)}
+            placeholder="np. #ORD-2024-7891"
+            className="w-full p-3 border border-primary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            disabled={isLoading}
+          />
+          <p className="text-xs text-primary-600 mt-1">
+            Numer zamówienia - służy do weryfikacji
+          </p>
         </div>
       </div>
 
@@ -547,10 +514,10 @@ function ImageUploader({ onValidationStart, onValidationComplete, onValidationEr
       <div className="mt-6 flex justify-end">
         <button
           onClick={handleSubmit}
-          disabled={!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20}
+          disabled={!orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20}
           className={`
             px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2
-            ${!orderEmail.trim() || !orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20
+            ${!orderNumber.trim() || selectedFiles.length === 0 || isLoading || !acceptTerms || !customerName.trim() || starRating === 0 || textReview.trim().length < 20
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-primary-600 hover:bg-primary-700 text-white'
             }
