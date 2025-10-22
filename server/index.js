@@ -17,7 +17,10 @@ app.use(helmet());
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://ugc-validation-frontend-production-ce00.up.railway.app'] 
+    ? [
+        'https://ugc-validation-frontend-production-ce00.up.railway.app',
+        'https://ugc-validation.pages.dev'
+      ] 
     : ['http://localhost:3000'],
   credentials: true
 }));
