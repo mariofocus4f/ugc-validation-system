@@ -13,6 +13,7 @@ export async function handleValidation(request, env, headers) {
     
     // Extract fields
     const orderNumber = formData.get('orderNumber');
+    const orderEmail = formData.get('orderEmail');
     const textReview = formData.get('textReview');
     const customerName = formData.get('customerName');
     const starRating = parseInt(formData.get('starRating'));
@@ -21,13 +22,26 @@ export async function handleValidation(request, env, headers) {
     const images = formData.getAll('images');
     
     console.log(`📝 Processing validation for order: ${orderNumber}`);
+    console.log(`📧 Email: ${orderEmail}`);
     console.log(`📸 Received ${images.length} images`);
     
     // Validate required fields
-    if (!orderNumber || !textReview || !customerName || !starRating) {
+    if (!orderNumber || !orderEmail || !textReview || !customerName || !starRating) {
       return new Response(JSON.stringify({
         error: 'Nieprawidłowe dane wejściowe',
         message: 'Wszystkie pola są wymagane'
+      }), {
+        status: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(orderEmail)) {
+      return new Response(JSON.stringify({
+        error: 'Nieprawidłowy email',
+        message: 'Wprowadź prawidłowy adres email'
       }), {
         status: 400,
         headers: { ...headers, 'Content-Type': 'application/json' }
@@ -164,6 +178,7 @@ export async function handleValidation(request, env, headers) {
     try {
       reviewId = await saveToDatabase({
         orderNumber,
+        orderEmail,
         customerName,
         textReview,
         starRating,
@@ -182,6 +197,7 @@ export async function handleValidation(request, env, headers) {
       if (env.AIRTABLE_API_KEY && env.AIRTABLE_BASE_ID && status === 'accepted') {
         await saveToAirtable({
           orderNumber,
+          orderEmail,
           customerName,
           textReview,
           starRating,
@@ -208,6 +224,7 @@ export async function handleValidation(request, env, headers) {
       reviewId,
       orderInfo: {
         orderNumber,
+        orderEmail,
         textReview,
         customerName,
         starRating

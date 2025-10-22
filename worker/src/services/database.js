@@ -7,6 +7,7 @@ export async function saveToDatabase(data, db) {
   try {
     const {
       orderNumber,
+      orderEmail,
       customerName,
       textReview,
       starRating,
@@ -19,15 +20,17 @@ export async function saveToDatabase(data, db) {
     const insertReview = await db.prepare(`
       INSERT INTO reviews (
         order_number,
+        order_email,
         customer_name,
         text_review,
         star_rating,
         status,
         image_urls,
         created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `).bind(
       orderNumber,
+      orderEmail,
       customerName,
       textReview,
       starRating,

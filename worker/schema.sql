@@ -4,6 +4,7 @@
 CREATE TABLE IF NOT EXISTS reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_number TEXT NOT NULL,
+    order_email TEXT NOT NULL,
     customer_name TEXT NOT NULL,
     text_review TEXT NOT NULL,
     star_rating INTEGER NOT NULL,

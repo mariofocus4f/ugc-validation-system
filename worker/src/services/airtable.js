@@ -41,6 +41,7 @@ export async function saveToAirtable(reviewData, env) {
     
     const {
       orderNumber,
+      orderEmail,
       customerName,
       textReview,
       starRating,
@@ -59,6 +60,7 @@ export async function saveToAirtable(reviewData, env) {
       body: JSON.stringify({
         fields: {
           order_number: orderNumber,
+          order_email: orderEmail,
           customer_name: customerName,
           text_review: textReview,
           star_rating: starRating,
