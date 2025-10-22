@@ -1,0 +1,22 @@
+{
+  "name": "ugc-validation-worker",
+  "version": "2.0.0",
+  "description": "Cloudflare Worker backend for UGC validation system",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:create": "wrangler d1 create ugc-validation-db",
+    "db:init": "wrangler d1 execute ugc-validation-db --file=./schema.sql",
+    "db:query": "wrangler d1 execute ugc-validation-db --command",
+    "r2:create": "wrangler r2 bucket create ugc-images"
+  },
+  "keywords": ["cloudflare", "workers", "ugc", "validation"],
+  "author": "FocusGarden",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
+

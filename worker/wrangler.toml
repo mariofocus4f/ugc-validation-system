@@ -1,0 +1,29 @@
+name = "ugc-validation-api"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+account_id = "cab46368e9d0f384430fa80457d315de"
+
+# Cloudflare R2 bucket for image storage
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "ugc-images"
+
+# Cloudflare D1 database
+[[d1_databases]]
+binding = "DB"
+database_name = "ugc-validation-db"
+database_id = "b8c63528-4ac8-49d6-90ea-d1db9047bae9"
+
+# Environment variables (secrets set via: wrangler secret put SECRET_NAME)
+[vars]
+ENVIRONMENT = "production"
+CORS_ORIGIN = "https://ugc-validation.pages.dev"
+MAX_FILE_SIZE = "5242880"
+MAX_FILES = "3"
+MIN_IMAGE_WIDTH = "400"
+
+# Secrets (set separately):
+# AIRTABLE_API_KEY
+# AIRTABLE_BASE_ID
+# CLOUDFLARE_ACCOUNT_ID
+

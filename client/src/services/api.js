@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://ugc-validation-system-production.up.railway.app/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://ugc-validation-api.mariusz-labudda.workers.dev',
   timeout: 60000, // 60 seconds timeout for image processing
   headers: {
     'Content-Type': 'multipart/form-data',

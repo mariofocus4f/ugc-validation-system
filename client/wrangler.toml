@@ -1,0 +1,19 @@
+name = "ugc-validation-frontend"
+compatibility_date = "2024-01-01"
+account_id = "cab46368e9d0f384430fa80457d315de"
+
+# Pages configuration
+[pages]
+# Build configuration
+build.command = "npm run build"
+build.destination = "build"
+
+# Environment variables for production
+[env.production]
+REACT_APP_API_URL = "https://ugc-validation-api.mariusz-labudda.workers.dev"
+
+# Environment variables for preview
+[env.preview]
+REACT_APP_API_URL = "https://ugc-validation-api.mariusz-labudda.workers.dev"
+
+

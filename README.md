@@ -15,23 +15,25 @@ System automatycznej walidacji zdjęć UGC (User Generated Content) z wykorzysta
 ## 🏗️ Architektura
 
 ```
-├── client/          # Frontend React
-├── server/          # Backend Node.js/Express
+├── client/          # Frontend React → Cloudflare Pages
+├── server/          # Backend Node.js/Express → Railway
 ├── package.json     # Root package.json
 └── README.md        # Dokumentacja
 ```
 
-### Frontend (React)
+### Frontend (React) → ☁️ Cloudflare Pages
 - Komponent uploadu z drag & drop
 - Wyświetlanie wyników walidacji
 - Responsywny design z Tailwind CSS
 - Integracja z backend API
+- **Gotowy do wdrożenia na Cloudflare Pages!**
 
-### Backend (Node.js/Express)
+### Backend (Node.js/Express) → 🚂 Railway
 - Endpoint `/api/ugc/validate` - walidacja zdjęć
 - Integracja z OpenAI Vision API
 - Rate limiting i zabezpieczenia
 - Walidacja plików i wymiarów
+- Pozostaje na Railway
 
 ## 🚀 Instalacja i uruchomienie
 
@@ -207,6 +209,39 @@ npm test
 
 ## 🚀 Deployment
 
+### Cloudflare Pages (Frontend) - REKOMENDOWANE ⭐
+
+Frontend jest gotowy do wdrożenia na **Cloudflare Pages**:
+
+```bash
+# Metoda 1: GitHub Integration (najprostsza)
+# 1. Push do GitHub
+# 2. Połącz repozytorium w Cloudflare Dashboard
+# 3. Gotowe! Automatyczne deploymenty
+
+# Metoda 2: Wrangler CLI
+cd client
+npm run build
+wrangler pages deploy build --project-name=ugc-validation-frontend
+```
+
+**Szczegóły:**
+- 📚 [CLOUDFLARE_QUICKSTART.md](./CLOUDFLARE_QUICKSTART.md) - Szybki start (5 minut)
+- 📖 [CLOUDFLARE_MIGRATION.md](./CLOUDFLARE_MIGRATION.md) - Pełna dokumentacja
+
+**Korzyści Cloudflare Pages:**
+- ⚡ Globalny CDN (300+ lokalizacji)
+- 💰 Darmowy hosting
+- 🔒 Automatyczne SSL
+- 🚀 Automatyczne deploymenty z GitHub
+
+### Railway (Backend) - Obecny
+
+Backend pozostaje na Railway:
+- URL: `https://ugc-validation-system-production.up.railway.app`
+- Automatyczne deploymenty z GitHub
+- Environment variables w Railway Dashboard
+
 ### Docker (opcjonalnie)
 
 ```dockerfile
@@ -222,11 +257,20 @@ CMD ["npm", "start"]
 
 ### Environment variables dla produkcji
 
+**Frontend (Cloudflare):**
+```env
+REACT_APP_API_URL=https://ugc-validation-system-production.up.railway.app/api
+NODE_ENV=production
+```
+
+**Backend (Railway):**
 ```env
 NODE_ENV=production
 PORT=3001
 OPENAI_API_KEY=your_production_key
 RATE_LIMIT_MAX_REQUESTS=100
+AIRTABLE_API_KEY=your_key
+CLOUDINARY_API_KEY=your_key
 ```
 
 ## 📈 KPI i metryki
