@@ -97,7 +97,7 @@ export const validateImages = async (files, textReview, orderNumber, orderEmail,
       formData.append('acceptedImages', JSON.stringify(fixModeData.acceptedImages));
     }
 
-    const response = await api.post('/ugc/validate', formData, {
+    const response = await api.post('/api/ugc/validate', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -115,7 +115,7 @@ export const validateImages = async (files, textReview, orderNumber, orderEmail,
  */
 export const getSystemStatus = async () => {
   try {
-    const response = await api.get('/ugc/status');
+    const response = await api.get('/api/ugc/status');
     return response.data;
   } catch (error) {
     throw error;
